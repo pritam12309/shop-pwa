@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghosh Shop</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <h1>Ghosh Shop</h1>
+        <button id="cart-btn" class="cart-btn">
+            Cart (<span id="cart-count">0</span>)
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Search & Categories -->
+        <div class="filters">
+            <input type="text" id="search-input" placeholder="Search products..." autocomplete="off">
+            <div id="category-filters" class="category-filters">
+                <button class="cat-btn active" data-category="all">All</button>
+                <button class="cat-btn" data-category="Grains">Grains</button>
+                <button class="cat-btn" data-category="Pantry">Pantry</button>
+                <button class="cat-btn" data-category="Snacks">Snacks & Beverages</button>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <section id="product-grid" class="product-grid">
+            <!-- Dynamically populated -->
+        </section>
+    </main>
+
+    <!-- Cart Modal / Drawer -->
+    <div id="cart-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Your Cart</h2>
+                <button id="close-cart" class="close-btn">&times;</button>
+            </div>
+            
+            <div id="cart-items" class="cart-items">
+                <!-- Dynamically populated -->
+            </div>
+
+            <div class="cart-summary">
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span id="cart-total">₹0</span>
+                </div>
+
+                <!-- Checkout Form -->
+                <form id="checkout-form" class="checkout-form">
+                    <h3>Customer Details</h3>
+                    <input type="text" id="cust-name" placeholder="Full Name" required>
+                    <input type="tel" id="cust-phone" placeholder="Phone Number" required>
+                    <textarea id="cust-address" placeholder="Delivery Address" rows="2" required></textarea>
+                    
+                    <button type="submit" id="whatsapp-btn" class="whatsapp-btn">
+                        Order via WhatsApp 📱
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Placeholder (Ready for integration later) -->
+    <!-- 
+    <script type="module">
+      // Import Firebase SDK here when ready
+    // const firebaseConfig = { ... };
+    </script> 
+    -->
+
+    <script src="app.js"></script>
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker registered!', reg))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>
+
