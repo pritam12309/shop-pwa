@@ -1,16 +1,16 @@
 // ==========================================
-// 1. PASTE YOUR FIREBASE WEB APP CONFIG HERE
+// FIREBASE WEB APP CONFIGURATION
 // ==========================================
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBdQTvvvu2AhL9iIntzhHHTJ_Ru33MW-Lk",
+    authDomain: "ghosh-technology.firebaseapp.com",
+    projectId: "ghosh-technology",
+    storageBucket: "ghosh-technology.firebasestorage.app",
+    messagingSenderId: "205502617306",
+    appId: "1:205502617306:web:9042b9f106130e24f8f7e3"
 };
 
-// Fallback Sample Products (Used if offline or if Firebase isn't configured yet)
+// Fallback Sample Products (Used if offline or if Firestore is empty)
 const sampleProducts = [
     { id: "1", name: "Normal Rice", price: 60, weight: "1", unit: "kg", category: "Grains", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300" },
     { id: "2", name: "Basmati Rice", price: 90, weight: "1", unit: "kg", category: "Grains", image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=300" },
@@ -72,12 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Load Products from Firestore "Products" Collection
 async function loadProductsFromFirebase() {
-    // Check if user has added valid configuration
-    if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY_HERE") {
-        console.log("Firebase config not found. Using local sample products.");
-        return;
-    }
-
     try {
         // Import Firebase modules dynamically using CDN ESM builds
         const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
