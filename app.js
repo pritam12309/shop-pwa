@@ -87,13 +87,14 @@ async function loadProductsFromFirebase() {
         });
 
         products = firebaseProducts;
-        console.log("Successfully loaded products from Firestore!");
+        console.log("Successfully loaded products from Firestore! Total items:", products.length);
     } catch (error) {
-        console.error("Firebase Error:", error);
+        console.error("Firebase Error Details:", error);
         productGrid.innerHTML = `
             <div style="grid-column: 1/-1; background-color: #FEE2E2; border: 1px solid #EF4444; color: #991B1B; padding: 1.5rem; border-radius: 8px; text-align: left;">
-                <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">⚠️ Failed to load products from Firebase</h3>
-                <p style="font-family: monospace; font-size: 0.85rem; word-break: break-all;">${error.message || error}</p>
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">⚠️ Firebase Connection Error</h3>
+                <p style="font-family: monospace; font-size: 0.85rem; word-break: break-all; margin-bottom: 0.5rem;">${error.message || error}</p>
+                <p style="font-size: 0.85rem; color: #7F1D1D;">Please check your Firebase Firestore rules or internet connection.</p>
             </div>
         `;
     }
@@ -101,7 +102,7 @@ async function loadProductsFromFirebase() {
 
 // Render Products based on filters
 function renderProducts() {
-    if (products.length === 0 && productGrid.innerHTML.includes('Failed to load products')) {
+    if (products.length === 0 && productGrid.innerHTML.includes('Firebase Connection Error')) {
         return;
     }
 
@@ -114,7 +115,7 @@ function renderProducts() {
     });
 
     if (filtered.length === 0) {
-        productGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #6B7280; padding: 2rem;">No products found.</p>';
+        productGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #6B7280; padding: 2rem;">No products found in Firestore collection "Products".</p>';
         return;
     }
 
