@@ -1,4 +1,16 @@
-// Sample Products (Prepared for future Firestore collection structure)
+// ==========================================
+// 1. PASTE YOUR FIREBASE WEB APP CONFIG HERE
+// ==========================================
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY_HERE",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Fallback Sample Products (Used if offline or if Firebase isn't configured yet)
 const sampleProducts = [
     { id: "1", name: "Normal Rice", price: 60, weight: "1", unit: "kg", category: "Grains", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300" },
     { id: "2", name: "Basmati Rice", price: 90, weight: "1", unit: "kg", category: "Grains", image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=300" },
@@ -27,7 +39,10 @@ const categoryFilters = document.getElementById('category-filters');
 const checkoutForm = document.getElementById('checkout-form');
 
 // Initialize App
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Attempt to load products from Firebase Firestore
+    await loadProductsFromFirebase();
+
     renderProducts();
     updateCartUI();
 
@@ -54,6 +69,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     checkoutForm.addEventListener('submit', handleWhatsAppCheckout);
 });
+
+// Load Products from Firestore "Products" Collection
+async function loadProductsFromFirebase() {
+    // Check if user has added valid configuration
+    if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY_HERE") {
+        console.log("Firebase config not found. Using local sample products.");
+        return;
+    }
+
+    try {
+        // Import Firebase modules dynamically using CDN ESM builds
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+        const { getFirestore, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        const querySnapshot = await getDocs(collection(db, "Products"));
+        const firebaseProducts = [];
+
+        querySnapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            firebaseProducts.push({
+                id: docSnap.id,
+                name: data.name || "Unnamed Product",
+                price: Number(data.price) || 0,
+                weight: data.weight || "1",
+                unit: data.unit || "unit",
+                category: data.category || "Pantry",
+                image: data.image || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=300"
+            });
+        });
+
+        if (firebaseProducts.length > 0) {
+            products = firebaseProducts;
+            console.log("Successfully loaded products from Firestore!");
+        }
+    } catch (error) {
+        console.warn("Could not load from Firebase, falling back to sample products:", error);
+    }
+}
 
 // Render Products based on filters
 function renderProducts() {
@@ -120,11 +176,9 @@ function saveAndRefreshCart() {
 }
 
 function updateCartUI() {
-    // Update badge count
     const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
     cartCount.textContent = totalCount;
 
-    // Render Cart Items
     cartItemsContainer.innerHTML = '';
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align: center; color: #6B7280; margin-top: 2rem;">Your cart is empty.</p>';
@@ -181,7 +235,6 @@ function handleWhatsAppCheckout(e) {
 
     message += `\n*Total Amount:* ₹${total}`;
 
-    // Replace with your active shop WhatsApp number (with country code, e.g., 919876543210)
     const shopWhatsAppNumber = "919876543210"; 
     const encodedMessage = encodeURIComponent(message);
     const whatsappURL = `https://wa.me/${shopWhatsAppNumber}?text=${encodedMessage}`;
