@@ -10,18 +10,8 @@ const firebaseConfig = {
     appId: "1:205502617306:web:9042b9f106130e24f8f7e3"
 };
 
-// Fallback Sample Products (Used if offline or if Firestore is empty)
-const sampleProducts = [
-    { id: "1", name: "Normal Rice", price: 60, weight: "1", unit: "kg", category: "Grains", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300" },
-    { id: "2", name: "Basmati Rice", price: 90, weight: "1", unit: "kg", category: "Grains", image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=300" },
-    { id: "3", name: "Wheat Flour", price: 50, weight: "1", unit: "kg", category: "Grains", image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300" },
-    { id: "4", name: "Sugar", price: 45, weight: "1", unit: "kg", category: "Pantry", image: "https://images.unsplash.com/photo-1581441363689-1f3c3c342617?w=300" },
-    { id: "5", name: "Biscuits", price: 20, weight: "1", unit: "pack", category: "Snacks", image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=300" },
-    { id: "6", name: "Tea", price: 120, weight: "250", unit: "g", category: "Snacks", image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300" }
-];
-
-// App State
-let products = [...sampleProducts];
+// App State (No silent fallback - products start empty until fetched from Firestore)
+let products = [];
 let cart = JSON.parse(localStorage.getItem('ghosh_shop_cart')) || [];
 let currentCategory = 'all';
 let searchQuery = '';
@@ -96,17 +86,27 @@ async function loadProductsFromFirebase() {
             });
         });
 
-        if (firebaseProducts.length > 0) {
-            products = firebaseProducts;
-            console.log("Successfully loaded products from Firestore!");
-        }
+        products = firebaseProducts;
+        console.log("Successfully loaded products from Firestore!");
     } catch (error) {
-        console.warn("Could not load from Firebase, falling back to sample products:", error);
+        console.error("Firebase Error:", error);
+        // Display the actual Firebase error clearly on the webpage instead of hiding it
+        productGrid.innerHTML = `
+            <div style="grid-column: 1/-1; background-color: #FEE2E2; border: 1px solid #EF4444; color: #991B1B; padding: 1.5rem; border-radius: 8px; text-align: left;">
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">⚠️ Failed to load products from Firebase</h3>
+                <p style="font-family: monospace; font-size: 0.85rem; word-break: break-all;">${error.message || error}</p>
+            </div>
+        `;
     }
 }
 
 // Render Products based on filters
 function renderProducts() {
+    // If an error message box was already rendered, don't overwrite it unless products exist
+    if (products.length === 0 && productGrid.innerHTML.includes('Failed to load products')) {
+        return;
+    }
+
     productGrid.innerHTML = '';
 
     const filtered = products.filter(p => {
