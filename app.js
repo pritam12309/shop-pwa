@@ -10,7 +10,7 @@ const firebaseConfig = {
     appId: "1:205502617306:web:9042b9f106130e24f8f7e3"
 };
 
-// App State (No silent fallback - products start empty until fetched from Firestore)
+// App State
 let products = [];
 let cart = JSON.parse(localStorage.getItem('ghosh_shop_cart')) || [];
 let currentCategory = 'all';
@@ -63,11 +63,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Load Products from Firestore "Products" Collection
 async function loadProductsFromFirebase() {
     try {
-        // Import Firebase modules dynamically using CDN ESM builds
-        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+        // Import Firebase modules dynamically using reliable CDN ESM builds
+        const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
         const { getFirestore, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
 
-        const app = initializeApp(firebaseConfig);
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const db = getFirestore(app);
         
         const querySnapshot = await getDocs(collection(db, "Products"));
@@ -90,7 +90,6 @@ async function loadProductsFromFirebase() {
         console.log("Successfully loaded products from Firestore!");
     } catch (error) {
         console.error("Firebase Error:", error);
-        // Display the actual Firebase error clearly on the webpage instead of hiding it
         productGrid.innerHTML = `
             <div style="grid-column: 1/-1; background-color: #FEE2E2; border: 1px solid #EF4444; color: #991B1B; padding: 1.5rem; border-radius: 8px; text-align: left;">
                 <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">⚠️ Failed to load products from Firebase</h3>
@@ -102,7 +101,6 @@ async function loadProductsFromFirebase() {
 
 // Render Products based on filters
 function renderProducts() {
-    // If an error message box was already rendered, don't overwrite it unless products exist
     if (products.length === 0 && productGrid.innerHTML.includes('Failed to load products')) {
         return;
     }
