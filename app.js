@@ -229,7 +229,7 @@ function handleWhatsAppCheckout(e) {
 
     message += `\n*Total Amount:* ₹${total}`;
 
-    const shopWhatsAppNumber = "919876543210"; 
+    const shopWhatsAppNumber = "917866029593"; 
     const encodedMessage = encodeURIComponent(message);
     const whatsappURL = `https://wa.me/${shopWhatsAppNumber}?text=${encodedMessage}`;
 
